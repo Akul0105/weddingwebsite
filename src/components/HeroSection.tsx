@@ -1,6 +1,7 @@
 // src/components/HeroSection.tsx
 
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function HeroSection() {
   return (
@@ -30,8 +31,10 @@ export function HeroSection() {
           and even your cake — we are here for all the days along the way.
         </p>
         <div className="flex gap-4">
-          <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-200">
-            Let&#39;s go
+          <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-200" asChild>
+            <Link href="/vendors">
+              Let&#39;s go
+            </Link>
           </Button>
           <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900">
             Find a couple

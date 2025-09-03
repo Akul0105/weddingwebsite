@@ -5,6 +5,7 @@
 import * as React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -18,10 +19,10 @@ import { Button } from './ui/button';
 
 // --- FAKE DATA (Replace with your database data later) ---
 const vendorCategories = [
-  { name: 'Photographers', description: 'Browse galleries to find your look.', image: '/photographer.jpg', link: '/vendors/photographers' },
-  { name: 'Venues', description: 'See outdoor spaces and historic buildings.', image: '/venues.jpg', link: '/vendors/venues' },
-  { name: 'Cakes', description: 'Meet bakers and set up tastings.', image: '/cake.jpg', link: '/vendors/cakes' },
-  { name: 'DJs', description: 'Keep your dance floor moving.', image: '/dj.jpg', link: '/vendors/djs' },
+  { name: 'Photographers', description: 'Browse galleries to find your look.', image: '/Photographer.jpg', link: '/vendors/photographers' },
+  { name: 'Venues', description: 'See outdoor spaces and historic buildings.', image: '/Venues.jpg', link: '/vendors/venues' },
+  { name: 'Cakes', description: 'Meet bakers and set up tastings.', image: '/Cake.jpg', link: '/vendors/cakes' },
+  { name: 'DJs', description: 'Keep your dance floor moving.', image: '/DJ.jpg', link: '/vendors/djs' },
   { name: 'Decorators', description: 'Bring your vision to life.', image: '/decorations.jpg', link: '/vendors/decorators' },
   { name: 'Makeup Artists', description: 'Get the perfect bridal glow.', image: '/makeup.jpg', link: '/vendors/makeup' },
 ];
@@ -63,8 +64,14 @@ export function VendorCarousel() {
                     <CardContent className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center p-6">
                       <h3 className="text-2xl font-bold mb-2">{category.name}</h3>
                       <p className="mb-4">{category.description}</p>
-                      <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900">
-                        Discover {category.name}
+                      <Button 
+                        variant="outline" 
+                        className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900"
+                        asChild
+                      >
+                        <Link href={category.link}>
+                          Discover {category.name}
+                        </Link>
                       </Button>
                     </CardContent>
                   </Card>

@@ -8,11 +8,12 @@ import { AvailabilityCalendar } from '@/components/ui/availability-calendar';
 import Image from 'next/image';
 import { MapPin, Star, Phone, Mail, Globe, Users, Award, Calendar, Clock, Wifi, Car, Utensils } from 'lucide-react';
 
-// Mock data for individual venue - replace with database data later
-const venueData = {
-  id: 1,
-  slug: 'tropical-paradise-resort',
-  name: "Tropical Paradise Resort",
+// Mock data for venues - replace with database data later
+const venues = {
+  'paradise-cove-hotel': {
+  id: 3,
+  slug: 'paradise-cove-hotel',
+  name: "Paradise Cove Hotel",
   location: "Belle Mare, Mauritius",
   rating: 4.9,
   reviews: 89,
@@ -104,6 +105,86 @@ const venueData = {
     "April 2025 - Available",
     "May 2025 - Available"
   ]
+  },
+  'chateau-de-labourdonnais': {
+    id: 4,
+    slug: 'chateau-de-labourdonnais',
+    name: "Château de Labourdonnais",
+    location: "Mapou, Mauritius",
+    rating: 4.9,
+    reviews: 203,
+    price: "From Rs 40,000",
+    image: "/Venues.jpg",
+    description: "Historic colonial mansion with beautiful gardens. Perfect for elegant and intimate weddings with a touch of history.",
+    capacity: "30-120 guests",
+    experience: "20+ years",
+    languages: ["English", "French", "Creole"],
+    features: ["Historic", "Garden", "Indoor", "Outdoor", "Elegant", "Intimate"],
+    amenities: [
+      "Historic mansion ceremony location",
+      "Beautiful garden reception options",
+      "Elegant indoor dining hall",
+      "Professional catering service",
+      "Audio-visual equipment",
+      "Wedding coordinator",
+      "Parking for 50+ cars",
+      "Free WiFi throughout venue"
+    ],
+    gallery: [
+      "/Venues.jpg",
+      "/Venues.jpg", 
+      "/Venues.jpg",
+      "/Venues.jpg",
+      "/Venues.jpg",
+      "/Venues.jpg"
+    ],
+    packages: [
+      {
+        name: "Garden Package",
+        price: "Rs 40,000",
+        duration: "6 hours",
+        includes: [
+          "Garden ceremony setup",
+          "Outdoor reception area",
+          "Basic decoration",
+          "Standard catering (3 courses)",
+          "Wedding coordinator",
+          "Basic audio system",
+          "Welcome drinks",
+          "Parking access"
+        ]
+      },
+      {
+        name: "Elegant Package",
+        price: "Rs 60,000",
+        duration: "8 hours",
+        includes: [
+          "Historic mansion ceremony",
+          "Elegant reception hall",
+          "Premium decoration",
+          "Gourmet catering (4 courses)",
+          "Dedicated wedding coordinator",
+          "Professional audio-visual system",
+          "Welcome cocktail + canapés",
+          "Wedding cake included",
+          "Photography locations access"
+        ]
+      }
+    ],
+    contact: {
+      phone: "+230 5 345 6789",
+      email: "events@chateaulabourdonnais.mu",
+      website: "www.chateaulabourdonnais.mu",
+      address: "Château de Labourdonnais, Mapou, Mauritius"
+    },
+    availability: [
+      "January 2025 - Available",
+      "February 2025 - Available", 
+      "March 2025 - 2 dates left",
+      "April 2025 - Available",
+      "May 2025 - Available"
+    ]
+  }
 };
 
 export default function VenueProfilePage({ params }: { params: { slug: string } }) {
@@ -112,6 +193,19 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
+
+  const venueData = venues[params.slug as keyof typeof venues];
+
+  if (!venueData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Venue Not Found</h1>
+          <p className="text-gray-600">The venue you're looking for doesn't exist.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -151,7 +245,7 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
             className="bg-white text-gray-900 hover:bg-gray-200"
             onClick={() => setShowBookingForm(true)}
           >
-            Book Venue - {venueData.price}
+            Book Venue
           </Button>
         </div>
       </div>
@@ -225,16 +319,17 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                 </CardContent>
               </Card>
 
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
                 vendorId={venueData.id.toString()}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />
-            </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
               {/* Contact Card */}
               <Card>
                 <CardContent className="p-6">

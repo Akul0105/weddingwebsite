@@ -8,8 +8,9 @@ import { AvailabilityCalendar } from '@/components/ui/availability-calendar';
 import Image from 'next/image';
 import { Calendar, MapPin, Star, Phone, Mail, Globe, Clock, Users, Award } from 'lucide-react';
 
-// Mock data for individual photographer - replace with database data later
-const photographerData = {
+// Mock data for photographers - replace with database data later
+const photographers = {
+  'sarah-johnson-photography': {
   id: 1,
   slug: 'sarah-johnson-photography',
   name: "Sarah Johnson Photography",
@@ -88,6 +89,70 @@ const photographerData = {
     "April 2025 - Available",
     "May 2025 - Available"
   ]
+  },
+  'mauritius-moments': {
+    id: 2,
+    slug: 'mauritius-moments',
+    name: "Mauritius Moments",
+    location: "Grand Baie, Mauritius",
+    rating: 4.8,
+    reviews: 89,
+    price: "From Rs 20,000",
+    image: "/Photographer.jpg",
+    description: "Capturing beautiful moments with a creative and artistic approach. Specializing in destination weddings and cultural celebrations.",
+    specialties: ["Wedding Photography", "Destination Weddings", "Cultural Events", "Portrait Photography"],
+    experience: "6+ years",
+    languages: ["English", "French", "Creole"],
+    equipment: "Nikon D850, Canon EOS R6, Professional Lighting",
+    portfolio: [
+      "/Photographer.jpg",
+      "/Photographer.jpg", 
+      "/Photographer.jpg",
+      "/Photographer.jpg",
+      "/Photographer.jpg",
+      "/Photographer.jpg"
+    ],
+    packages: [
+      {
+        name: "Essential Package",
+        price: "Rs 20,000",
+        duration: "6 hours",
+        includes: [
+          "Full day coverage",
+          "150+ edited photos",
+          "Online gallery",
+          "USB with photos",
+          "Basic editing"
+        ]
+      },
+      {
+        name: "Deluxe Package", 
+        price: "Rs 30,000",
+        duration: "8 hours",
+        includes: [
+          "Full day coverage",
+          "250+ edited photos",
+          "Online gallery",
+          "USB with photos",
+          "Premium editing",
+          "Engagement session"
+        ]
+      }
+    ],
+    contact: {
+      phone: "+230 5 234 5678",
+      email: "info@mauritiusmoments.mu",
+      website: "www.mauritiusmoments.mu",
+      address: "456 Coastal Road, Grand Baie, Mauritius"
+    },
+    availability: [
+      "January 2025 - Available",
+      "February 2025 - 1 date left", 
+      "March 2025 - Available",
+      "April 2025 - Available",
+      "May 2025 - 3 dates left"
+    ]
+  }
 };
 
 export default function PhotographerProfilePage({ params }: { params: { slug: string } }) {
@@ -96,6 +161,19 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
+
+  const photographerData = photographers[params.slug as keyof typeof photographers];
+
+  if (!photographerData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Photographer Not Found</h1>
+          <p className="text-gray-600">The photographer you're looking for doesn't exist.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -131,7 +209,7 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
             className="bg-white text-gray-900 hover:bg-gray-200"
             onClick={() => setShowBookingForm(true)}
           >
-            Book Now - {photographerData.price}
+            Book Now
           </Button>
         </div>
       </div>
@@ -203,16 +281,17 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
                 </CardContent>
               </Card>
 
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
                 vendorId={photographerData.id.toString()}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />
-            </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
               {/* Quick Stats */}
               <Card>
                 <CardContent className="p-6">
@@ -229,10 +308,6 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
                     <div className="flex justify-between">
                       <span>Experience</span>
                       <span className="font-semibold">{photographerData.experience}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Starting Price</span>
-                      <span className="font-semibold">{photographerData.price}</span>
                     </div>
                   </div>
                 </CardContent>

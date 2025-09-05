@@ -8,120 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-
-// Mock vendor data - replace with actual API call later
-const allVendors = [
-  // Photographers
-  {
-    id: 1,
-    name: "Sarah Johnson Photography",
-    category: "Photographers",
-    location: "Port Louis, Mauritius",
-    rating: 4.9,
-    reviews: 127,
-    price: "From Rs 25,000",
-    image: "/Photographer.jpg",
-    description: "Specializing in elegant wedding photography with a natural, candid style.",
-    specialties: ["Wedding", "Engagement", "Portrait"],
-    link: "/vendors/photographers/sarah-johnson-photography"
-  },
-  {
-    id: 2,
-    name: "Mauritius Moments",
-    category: "Photographers",
-    location: "Grand Baie, Mauritius",
-    rating: 4.8,
-    reviews: 89,
-    price: "From Rs 20,000",
-    image: "/Photographer.jpg",
-    description: "Capturing beautiful moments with a creative and artistic approach.",
-    specialties: ["Wedding", "Destination", "Cultural"],
-    link: "/vendors/photographers/mauritius-moments"
-  },
-  // Venues
-  {
-    id: 3,
-    name: "Paradise Cove Hotel",
-    category: "Venues",
-    location: "Anse la Raie, Mauritius",
-    rating: 4.7,
-    reviews: 156,
-    price: "From Rs 50,000",
-    image: "/Venues.jpg",
-    description: "Stunning beachfront venue with panoramic ocean views.",
-    specialties: ["Beach", "Luxury", "Outdoor"],
-    link: "/vendors/venues/paradise-cove-hotel"
-  },
-  {
-    id: 4,
-    name: "Château de Labourdonnais",
-    category: "Venues",
-    location: "Mapou, Mauritius",
-    rating: 4.9,
-    reviews: 203,
-    price: "From Rs 40,000",
-    image: "/Venues.jpg",
-    description: "Historic colonial mansion with beautiful gardens.",
-    specialties: ["Historic", "Garden", "Indoor"],
-    link: "/vendors/venues/chateau-de-labourdonnais"
-  },
-  // Cakes
-  {
-    id: 5,
-    name: "Sweet Dreams Bakery",
-    category: "Cakes",
-    location: "Curepipe, Mauritius",
-    rating: 4.8,
-    reviews: 95,
-    price: "From Rs 8,000",
-    image: "/Cake.jpg",
-    description: "Artisanal wedding cakes with unique designs and flavors.",
-    specialties: ["Custom", "Artisanal", "Traditional"],
-    link: "/vendors/cakes/sweet-dreams-bakery"
-  },
-  // DJs
-  {
-    id: 6,
-    name: "Island Beats DJ",
-    category: "DJs",
-    location: "Grand Baie, Mauritius",
-    rating: 4.6,
-    reviews: 78,
-    price: "From Rs 15,000",
-    image: "/DJ.jpg",
-    description: "Professional DJ services with modern sound equipment.",
-    specialties: ["Wedding", "Party", "Sound System"],
-    link: "/vendors/djs/island-beats-dj"
-  },
-  // Decorators
-  {
-    id: 7,
-    name: "Elegant Events",
-    category: "Decorators",
-    location: "Port Louis, Mauritius",
-    rating: 4.7,
-    reviews: 112,
-    price: "From Rs 20,000",
-    image: "/decorations.jpg",
-    description: "Transform your venue into a magical wonderland.",
-    specialties: ["Floral", "Lighting", "Themed"],
-    link: "/vendors/decorators/elegant-events"
-  },
-  // Makeup Artists
-  {
-    id: 8,
-    name: "Bridal Beauty Studio",
-    category: "Makeup Artists",
-    location: "Flic en Flac, Mauritius",
-    rating: 4.9,
-    reviews: 145,
-    price: "From Rs 12,000",
-    image: "/makeup.jpg",
-    description: "Professional bridal makeup and hair styling services.",
-    specialties: ["Bridal", "Hair", "Makeup"],
-    link: "/vendors/makeup/bridal-beauty-studio"
-  }
-];
+import { VendorService } from '@/services/vendorService';
+import { Vendor } from '@/types/vendor';
 
 interface SearchBarProps {
   className?: string;
@@ -129,24 +17,25 @@ interface SearchBarProps {
 
 export function SearchBar({ className = "" }: SearchBarProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Vendor[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (searchTerm.length > 2) {
       setIsSearching(true);
-      const filtered = allVendors.filter(vendor =>
-        vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vendor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vendor.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        vendor.specialties.some(specialty => 
-          specialty.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-      setSearchResults(filtered);
-      setShowResults(true);
-      setIsSearching(false);
+      VendorService.searchVendors(searchTerm)
+        .then(results => {
+          setSearchResults(results);
+          setShowResults(true);
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          toast.error('Failed to search vendors');
+        })
+        .finally(() => {
+          setIsSearching(false);
+        });
     } else {
       setSearchResults([]);
       setShowResults(false);
@@ -268,7 +157,7 @@ export function SearchBar({ className = "" }: SearchBarProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Link href={vendor.link}>
+                    <Link href={`/vendors/${vendor.category.toLowerCase()}/${vendor.slug}`}>
                       <motion.div
                         whileHover={{ scale: 1.02, x: 5 }}
                         whileTap={{ scale: 0.98 }}

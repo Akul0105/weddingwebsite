@@ -38,12 +38,35 @@ export function AvailabilityManager({
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>();
   const [isEditing, setIsEditing] = React.useState(false);
 
-  // Load availability data (replace with API call)
+  // Load availability data from API
   React.useEffect(() => {
-    // Mock data - replace with actual API call
-    const mockAvailability = generateMockAvailability();
-    setAvailability(mockAvailability);
+    loadAvailability();
   }, [vendorId]);
+
+  const loadAvailability = async () => {
+    try {
+      const response = await fetch(`/api/vendors/${vendorId}/availability`);
+      const data = await response.json();
+      
+      if (data.success) {
+        const availability = {
+          availableDates: data.data.availableDates.map((dateStr: string) => new Date(dateStr)),
+          unavailableDates: data.data.unavailableDates.map((dateStr: string) => new Date(dateStr)),
+          partiallyAvailableDates: data.data.partiallyAvailableDates.map((dateStr: string) => new Date(dateStr))
+        };
+        setAvailability(availability);
+      } else {
+        // Fall back to mock data
+        const mockAvailability = generateMockAvailability();
+        setAvailability(mockAvailability);
+      }
+    } catch (error) {
+      console.error('Failed to load availability:', error);
+      // Fall back to mock data
+      const mockAvailability = generateMockAvailability();
+      setAvailability(mockAvailability);
+    }
+  };
 
   const generateMockAvailability = () => {
     const today = new Date();
@@ -142,14 +165,40 @@ export function AvailabilityManager({
     });
   };
 
-  const handleSave = () => {
-    // Save to API
-    if (onSave) {
-      onSave(availability);
+  const handleSave = async () => {
+    try {
+      // Convert Date objects to ISO strings for API
+      const availabilityData = {
+        availableDates: availability.availableDates.map(date => date.toISOString().split('T')[0]),
+        unavailableDates: availability.unavailableDates.map(date => date.toISOString().split('T')[0]),
+        partiallyAvailableDates: availability.partiallyAvailableDates.map(date => date.toISOString().split('T')[0])
+      };
+
+      const response = await fetch(`/api/vendors/${vendorId}/availability`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(availabilityData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Availability updated successfully!');
+        setIsEditing(false);
+        setSelectedDate(undefined);
+        
+        if (onSave) {
+          onSave(availability);
+        }
+      } else {
+        toast.error('Failed to update availability');
+      }
+    } catch (error) {
+      console.error('Error saving availability:', error);
+      toast.error('Failed to update availability');
     }
-    toast.success('Availability updated successfully!');
-    setIsEditing(false);
-    setSelectedDate(undefined);
   };
 
   const handleReset = () => {

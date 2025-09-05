@@ -69,8 +69,10 @@ export default function VendorsPage() {
           <p className="text-lg md:text-xl max-w-2xl mb-6">
             Find the perfect vendors for every aspect of your wedding
           </p>
-          <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-200">
-            Browse All Vendors
+          <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-200" asChild>
+            <Link href="/vendors/all">
+              Browse All Vendors
+            </Link>
           </Button>
         </div>
       </div>

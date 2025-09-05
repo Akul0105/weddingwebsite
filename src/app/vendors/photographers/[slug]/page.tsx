@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { WeddingDatePicker } from '@/components/ui/date-picker';
+import { AvailabilityCalendar } from '@/components/ui/availability-calendar';
 import Image from 'next/image';
 import { Calendar, MapPin, Star, Phone, Mail, Globe, Clock, Users, Award } from 'lucide-react';
 
@@ -92,6 +94,8 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [weddingDate, setWeddingDate] = useState<Date | undefined>();
+  const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -139,7 +143,6 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'portfolio', label: 'Portfolio' },
-              { id: 'packages', label: 'Packages & Pricing' },
               { id: 'reviews', label: 'Reviews' },
               { id: 'contact', label: 'Contact' }
             ].map((tab) => (
@@ -200,55 +203,16 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
                 </CardContent>
               </Card>
 
-              {/* Availability */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Availability</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {photographerData.availability.map((month, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="font-medium">{month.split(' - ')[0]}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          month.includes('Available') 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {month.split(' - ')[1]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Availability Calendar */}
+              <AvailabilityCalendar
+                vendorId={photographerData.id.toString()}
+                selectedDate={selectedAvailabilityDate}
+                onDateSelect={setSelectedAvailabilityDate}
+              />
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Contact Card */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Contact Information</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Phone className="text-pink-500" />
-                      <span>{photographerData.contact.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Mail className="text-pink-500" />
-                      <span>{photographerData.contact.email}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Globe className="text-pink-500" />
-                      <span>{photographerData.contact.website}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <MapPin className="text-pink-500" />
-                      <span className="text-sm">{photographerData.contact.address}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* Quick Stats */}
               <Card>
                 <CardContent className="p-6">
@@ -273,6 +237,7 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
                   </div>
                 </CardContent>
               </Card>
+
             </div>
           </div>
         )}
@@ -297,62 +262,6 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
           </div>
         )}
 
-        {activeTab === 'packages' && (
-          <div>
-            <h2 className="text-3xl font-bold mb-8">Packages & Pricing</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {photographerData.packages.map((pkg, index) => (
-                <Card 
-                  key={index} 
-                  className={`relative overflow-hidden ${
-                    selectedPackage === index ? 'ring-2 ring-pink-500' : ''
-                  }`}
-                >
-                  {index === 1 && (
-                    <div className="absolute top-0 right-0 bg-pink-500 text-white px-3 py-1 text-sm font-medium">
-                      Most Popular
-                    </div>
-                  )}
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
-                    <div className="text-3xl font-bold text-pink-600 mb-2">{pkg.price}</div>
-                    <div className="text-gray-600 mb-4">{pkg.duration}</div>
-                    <ul className="space-y-2 mb-6">
-                      {pkg.includes.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-                          <span className="text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button 
-                      className={`w-full ${
-                        selectedPackage === index 
-                          ? 'bg-pink-600 hover:bg-pink-700' 
-                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                      }`}
-                      onClick={() => setSelectedPackage(index)}
-                    >
-                      {selectedPackage === index ? 'Selected' : 'Select Package'}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            
-            {selectedPackage !== null && (
-              <div className="mt-8 text-center">
-                <Button 
-                  size="lg" 
-                  className="bg-pink-600 hover:bg-pink-700"
-                  onClick={() => setShowBookingForm(true)}
-                >
-                  Book {photographerData.packages[selectedPackage].name} - {photographerData.packages[selectedPackage].price}
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
 
         {activeTab === 'reviews' && (
           <div>
@@ -389,81 +298,122 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
 
         {activeTab === 'contact' && (
           <div>
-            <h2 className="text-3xl font-bold mb-8">Get in Touch</h2>
+            <h2 className="text-3xl font-bold mb-8">Contact {photographerData.name}</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Contact Information</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Phone className="text-pink-500" />
-                      <div>
-                        <div className="font-medium">Phone</div>
-                        <div className="text-gray-600">{photographerData.contact.phone}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Mail className="text-pink-500" />
-                      <div>
-                        <div className="font-medium">Email</div>
-                        <div className="text-gray-600">{photographerData.contact.email}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Globe className="text-pink-500" />
-                      <div>
-                        <div className="font-medium">Website</div>
-                        <div className="text-gray-600">{photographerData.contact.website}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <MapPin className="text-pink-500" />
-                      <div>
-                        <div className="font-medium">Address</div>
-                        <div className="text-gray-600">{photographerData.contact.address}</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Send Message</h3>
+                  <h3 className="text-xl font-semibold mb-4">Send a Message</h3>
                   <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Name</label>
-                      <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        placeholder="Your name"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">First Name</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                          placeholder="Your first name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Last Name</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                          placeholder="Your last name"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Email</label>
                       <input
                         type="email"
+                        required
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         placeholder="your@email.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        placeholder="+230 5 123 4567"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Wedding Date</label>
+                      <WeddingDatePicker
+                        date={weddingDate}
+                        onDateChange={setWeddingDate}
+                        placeholder="Select your wedding date"
+                        minDate={new Date()}
+                        maxDate={new Date(new Date().getFullYear() + 2, 11, 31)} // 2 years from now
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Message</label>
                       <textarea
                         rows={4}
+                        required
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                        placeholder="Tell us about your wedding plans..."
+                        placeholder="Tell us about your wedding plans and what you're looking for..."
                       ></textarea>
                     </div>
-                    <Button className="w-full bg-pink-600 hover:bg-pink-700">
+                    <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700">
                       Send Message
                     </Button>
                   </form>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">Quick Info</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                        <span className="text-pink-600 font-semibold">★</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">Rating</div>
+                        <div className="text-gray-600">{photographerData.rating}/5 ({photographerData.reviews} reviews)</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                        <span className="text-pink-600 font-semibold">📍</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">Location</div>
+                        <div className="text-gray-600">{photographerData.location}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                        <span className="text-pink-600 font-semibold">💰</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">Starting Price</div>
+                        <div className="text-gray-600">{photographerData.price}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                        <span className="text-pink-600 font-semibold">⏱️</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">Experience</div>
+                        <div className="text-gray-600">{photographerData.experience}</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
+
       </div>
 
       {/* Booking Modal */}

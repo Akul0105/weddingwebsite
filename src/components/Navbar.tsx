@@ -12,6 +12,11 @@ export function Navbar() {
 
         {/* Navigation Buttons */}
         <div className="flex items-center gap-4">
+          <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white" asChild>
+            <Link href="/for-vendors">
+              For Vendors
+            </Link>
+          </Button>
           <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
             Log In
           </Button>

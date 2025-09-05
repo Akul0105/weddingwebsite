@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { WeddingDatePicker } from '@/components/ui/date-picker';
+import { AvailabilityCalendar } from '@/components/ui/availability-calendar';
 import Image from 'next/image';
 import { MapPin, Star, Phone, Mail, Globe, Users, Award, Calendar, Clock, Wifi, Car, Utensils } from 'lucide-react';
 
@@ -108,6 +110,8 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [weddingDate, setWeddingDate] = useState<Date | undefined>();
+  const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -221,28 +225,12 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                 </CardContent>
               </Card>
 
-              {/* Availability */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Availability</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {venueData.availability.map((month, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="font-medium">{month.split(' - ')[0]}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          month.includes('Available') 
-                            ? 'bg-green-100 text-green-800' 
-                            : month.includes('left')
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {month.split(' - ')[1]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Availability Calendar */}
+              <AvailabilityCalendar
+                vendorId={venueData.id.toString()}
+                selectedDate={selectedAvailabilityDate}
+                onDateSelect={setSelectedAvailabilityDate}
+              />
             </div>
 
             {/* Sidebar */}
@@ -568,10 +556,12 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Wedding Date</label>
-                    <input
-                      type="date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      required
+                    <WeddingDatePicker
+                      date={weddingDate}
+                      onDateChange={setWeddingDate}
+                      placeholder="Select your wedding date"
+                      minDate={new Date()}
+                      maxDate={new Date(new Date().getFullYear() + 2, 11, 31)} // 2 years from now
                     />
                   </div>
                   <div>

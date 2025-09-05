@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
@@ -76,6 +77,33 @@ const photographers = [
 ];
 
 export default function PhotographersPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('All Locations');
+  const [selectedPriceRange, setSelectedPriceRange] = useState('All Prices');
+  const [selectedStyle, setSelectedStyle] = useState('All Styles');
+
+  const filteredPhotographers = photographers.filter(photographer => {
+    const matchesSearch = searchTerm === '' || 
+      photographer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      photographer.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      photographer.specialties.some(specialty => 
+        specialty.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    
+    const matchesLocation = selectedLocation === 'All Locations' || 
+      photographer.location.includes(selectedLocation);
+    
+    const matchesPrice = selectedPriceRange === 'All Prices' || 
+      (selectedPriceRange === 'Under $600' && parseInt(photographer.price.replace(/[^0-9]/g, '')) < 600) ||
+      (selectedPriceRange === '$600-$800' && parseInt(photographer.price.replace(/[^0-9]/g, '')) >= 600 && parseInt(photographer.price.replace(/[^0-9]/g, '')) <= 800) ||
+      (selectedPriceRange === 'Over $800' && parseInt(photographer.price.replace(/[^0-9]/g, '')) > 800);
+    
+    const matchesStyle = selectedStyle === 'All Styles' || 
+      photographer.specialties.includes(selectedStyle);
+
+    return matchesSearch && matchesLocation && matchesPrice && matchesStyle;
+  });
+
   return (
     <main>
       {/* Hero Section */}
@@ -104,15 +132,56 @@ export default function PhotographersPage() {
       <div className="bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex gap-2">
-              <Button variant="outline">All Locations</Button>
-              <Button variant="outline">Price Range</Button>
-              <Button variant="outline">Style</Button>
+            <div className="flex gap-2 flex-wrap">
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+              >
+                <option value="All Locations">All Locations</option>
+                <option value="Port Louis">Port Louis</option>
+                <option value="Grand Baie">Grand Baie</option>
+                <option value="Flic en Flac">Flic en Flac</option>
+                <option value="Trou aux Biches">Trou aux Biches</option>
+                <option value="Le Morne">Le Morne</option>
+                <option value="Belle Mare">Belle Mare</option>
+              </select>
+              <select
+                value={selectedPriceRange}
+                onChange={(e) => setSelectedPriceRange(e.target.value)}
+                className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+              >
+                <option value="All Prices">All Prices</option>
+                <option value="Under $600">Under $600</option>
+                <option value="$600-$800">$600-$800</option>
+                <option value="Over $800">Over $800</option>
+              </select>
+              <select
+                value={selectedStyle}
+                onChange={(e) => setSelectedStyle(e.target.value)}
+                className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+              >
+                <option value="All Styles">All Styles</option>
+                <option value="Wedding">Wedding</option>
+                <option value="Engagement">Engagement</option>
+                <option value="Portrait">Portrait</option>
+                <option value="Destination">Destination</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Beach">Beach</option>
+                <option value="Luxury">Luxury</option>
+                <option value="Documentary">Documentary</option>
+                <option value="Storytelling">Storytelling</option>
+                <option value="Budget">Budget</option>
+                <option value="Traditional">Traditional</option>
+                <option value="Fine Art">Fine Art</option>
+              </select>
             </div>
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search photographers..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="px-4 py-2 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
@@ -120,11 +189,21 @@ export default function PhotographersPage() {
         </div>
       </div>
 
+      {/* Results Count */}
+      <div className="bg-white py-4 border-b">
+        <div className="container mx-auto px-4">
+          <p className="text-gray-600">
+            Showing {filteredPhotographers.length} photographer{filteredPhotographers.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </div>
+
       {/* Photographers Grid */}
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {photographers.map((photographer) => (
+          {filteredPhotographers.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPhotographers.map((photographer) => (
               <Card key={photographer.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
                 <div className="relative h-64">
                   <Image
@@ -169,7 +248,24 @@ export default function PhotographersPage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-gray-500 text-lg">No photographers found matching your criteria.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedLocation('All Locations');
+                  setSelectedPriceRange('All Prices');
+                  setSelectedStyle('All Styles');
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </main>

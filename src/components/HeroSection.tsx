@@ -1,9 +1,7 @@
+// src/components/HeroSection.tsx
 'use client';
 
-// src/components/HeroSection.tsx
-
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { SearchBar } from '@/components/SearchBar';
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 
@@ -11,7 +9,6 @@ export function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Ensure video plays when component mounts
     if (videoRef.current) {
       videoRef.current.play().catch(console.error);
     }
@@ -26,10 +23,9 @@ export function HeroSection() {
         loop
         muted
         playsInline
-        key="hero-video" // Force re-render when component mounts
+        key="hero-video"
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
         onLoadedData={() => {
-          // Ensure video plays when loaded
           if (videoRef.current) {
             videoRef.current.play().catch(console.error);
           }
@@ -68,27 +64,15 @@ export function HeroSection() {
           From venues and save the dates to a free wedding website, a registry
           and even your cake — we are here for all the days along the way.
         </motion.p>
-        
-        <motion.div 
-          className="flex gap-4"
+
+        {/* SearchBar below the intro text */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
+          className="w-full max-w-xl"
         >
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button 
-              size="lg" 
-              className="bg-white text-gray-900 hover:bg-gray-200 shadow-lg hover:shadow-xl transition-all duration-300" 
-              asChild
-            >
-              <Link href="/vendors">
-                Let&#39;s go
-              </Link>
-            </Button>
-          </motion.div>
+          <SearchBar />
         </motion.div>
       </div>
     </div>

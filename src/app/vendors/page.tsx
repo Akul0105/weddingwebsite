@@ -10,42 +10,42 @@ const vendorCategories = [
     name: 'Photographers',
     description: 'Capture your special moments with professional photographers',
     image: '/Photographer.jpg',
-    link: '/vendors/photographers',
+    link: '/vendors/all?category=Photographers',
     count: '50+ vendors'
   },
   {
     name: 'Venues',
     description: 'Find the perfect location for your dream wedding',
     image: '/Venues.jpg',
-    link: '/vendors/venues',
+    link: '/vendors/all?category=Venues',
     count: '30+ venues'
   },
   {
     name: 'Cakes',
     description: 'Delicious and beautiful cakes for your celebration',
     image: '/Cake.jpg',
-    link: '/vendors/cakes',
+    link: '/vendors/all?category=Cakes',
     count: '25+ bakers'
   },
   {
     name: 'DJs',
     description: 'Keep your dance floor moving all night long',
     image: '/DJ.jpg',
-    link: '/vendors/djs',
+    link: '/vendors/all?category=DJs',
     count: '40+ DJs'
   },
   {
     name: 'Decorators',
     description: 'Transform your venue into a magical wonderland',
     image: '/decorations.jpg',
-    link: '/vendors/decorators',
+    link: '/vendors/all?category=Decorators',
     count: '35+ decorators'
   },
   {
     name: 'Makeup Artists',
     description: 'Look stunning on your special day',
     image: '/makeup.jpg',
-    link: '/vendors/makeup',
+    link: '/vendors/all?category=Makeup Artists',
     count: '45+ artists'
   }
 ];

@@ -4,7 +4,6 @@ import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 
 import { VendorCarousel } from "@/components/VendorCarousel";
-import { Footer } from "@/components/Footer";
 
 export default function HomePage() {
   return (
@@ -13,7 +12,6 @@ export default function HomePage() {
       <HeroSection />
       
       <VendorCarousel />
-      <Footer /> 
 
 
 

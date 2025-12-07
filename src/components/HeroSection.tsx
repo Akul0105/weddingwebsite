@@ -51,7 +51,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Wedding planning starts here
+            Your Big Day, and Every Special Day, Starts Here.
           </motion.h1>
         </motion.div>
         
@@ -61,8 +61,8 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          From venues and save the dates to a free wedding website, a registry
-          and even your cake — we are here for all the days along the way.
+          From dream weddings to engagements, proposals, birthdays, and celebrations,
+          discover vendors, venues, and services for every moment worth remembering.
         </motion.p>
 
         {/* SearchBar below the intro text */}

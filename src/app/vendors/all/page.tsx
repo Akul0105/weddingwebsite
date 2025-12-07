@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SearchBar } from '@/components/SearchBar';
@@ -216,9 +217,19 @@ const allVendors = [
 const categories = ["All", "Photographers", "Venues", "Cakes", "DJs", "Decorators", "Makeup Artists"];
 
 export default function AllVendorsPage() {
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams.get('category');
+  
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  // Set category from URL parameter on mount
+  useEffect(() => {
+    if (categoryFromUrl && categories.includes(categoryFromUrl)) {
+      setSelectedCategory(categoryFromUrl);
+    }
+  }, [categoryFromUrl]);
 
   const filteredVendors = allVendors.filter(vendor => {
     const matchesCategory = selectedCategory === "All" || vendor.category === selectedCategory;

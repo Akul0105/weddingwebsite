@@ -1,5 +1,4 @@
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 
 export default function VendorsLayout({
   children,
@@ -10,7 +9,6 @@ export default function VendorsLayout({
     <>
       <Navbar />
       {children}
-      <Footer />
     </>
   );
 }

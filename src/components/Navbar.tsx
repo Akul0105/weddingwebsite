@@ -17,12 +17,6 @@ export function Navbar() {
               For Vendors
             </Link>
           </Button>
-          <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
-            Log In
-          </Button>
-          <Button className="bg-white text-gray-900 hover:bg-gray-200">
-            Get Started
-          </Button>
         </div>
       </div>
     </header>

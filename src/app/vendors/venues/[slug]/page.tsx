@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { WeddingDatePicker } from '@/components/ui/date-picker';
@@ -8,200 +8,28 @@ import { AvailabilityCalendar } from '@/components/ui/availability-calendar';
 import Image from 'next/image';
 import { MapPin, Star, Phone, Mail, Globe, Users, Award, Calendar, Clock, Wifi, Car, Utensils } from 'lucide-react';
 
-// Mock data for venues - replace with database data later
-const venues = {
-  'paradise-cove-hotel': {
-  id: 3,
-  slug: 'paradise-cove-hotel',
-  name: "Paradise Cove Hotel",
-  location: "Belle Mare, Mauritius",
-  rating: 4.9,
-  reviews: 89,
-  price: "From Rs 75,000",
-  image: "/Venues.jpg",
-  description: "Beachfront resort with stunning ocean views and luxury amenities. Perfect for dream destination weddings in Mauritius.",
-  capacity: "50-200 guests",
-  experience: "15+ years",
-  languages: ["English", "French", "Creole"],
-  features: ["Beachfront", "Ocean View", "Luxury", "All-inclusive", "Spa", "Pool", "Restaurant"],
-  amenities: [
-    "Beachfront ceremony location",
-    "Indoor/outdoor reception options",
-    "Bridal suite with ocean view",
-    "Professional catering service",
-    "Audio-visual equipment",
-    "Wedding coordinator",
-    "Parking for 100+ cars",
-    "Free WiFi throughout venue"
-  ],
-  gallery: [
-    "/Venues.jpg",
-    "/Venues.jpg", 
-    "/Venues.jpg",
-    "/Venues.jpg",
-    "/Venues.jpg",
-    "/Venues.jpg"
-  ],
-  packages: [
-    {
-      name: "Intimate Package",
-      price: "Rs 75,000",
-      capacity: "50-80 guests",
-      includes: [
-        "Beachfront ceremony setup",
-        "Indoor reception area",
-        "Basic decoration",
-        "Standard catering (3 courses)",
-        "Wedding coordinator",
-        "Bridal suite (2 hours)",
-        "Basic audio system"
-      ]
-    },
-    {
-      name: "Classic Package", 
-      price: "Rs 120,000",
-      capacity: "80-150 guests",
-      includes: [
-        "Beachfront ceremony setup",
-        "Large reception hall",
-        "Premium decoration",
-        "Premium catering (4 courses)",
-        "Wedding coordinator",
-        "Bridal suite (4 hours)",
-        "Professional audio system",
-        "Lighting setup",
-        "Welcome cocktail"
-      ]
-    },
-    {
-      name: "Luxury Package",
-      price: "Rs 200,000", 
-      capacity: "150-200 guests",
-      includes: [
-        "Beachfront ceremony setup",
-        "Grand reception hall",
-        "Luxury decoration",
-        "Gourmet catering (5 courses)",
-        "Dedicated wedding coordinator",
-        "Bridal suite (6 hours)",
-        "Professional audio-visual system",
-        "Premium lighting setup",
-        "Welcome cocktail + canapés",
-        "Wedding cake included",
-        "Photography locations access"
-      ]
-    }
-  ],
-  contact: {
-    phone: "+230 5 234 5678",
-    email: "events@tropicalparadise.mu",
-    website: "www.tropicalparadise.mu",
-    address: "Belle Mare Beach, Belle Mare, Mauritius"
-  },
-  availability: [
-    "January 2025 - 3 dates left",
-    "February 2025 - 1 date left", 
-    "March 2025 - Available",
-    "April 2025 - Available",
-    "May 2025 - Available"
-  ]
-  },
-  'chateau-de-labourdonnais': {
-    id: 4,
-    slug: 'chateau-de-labourdonnais',
-    name: "Château de Labourdonnais",
-    location: "Mapou, Mauritius",
-    rating: 4.9,
-    reviews: 203,
-    price: "From Rs 40,000",
-    image: "/Venues.jpg",
-    description: "Historic colonial mansion with beautiful gardens. Perfect for elegant and intimate weddings with a touch of history.",
-    capacity: "30-120 guests",
-    experience: "20+ years",
-    languages: ["English", "French", "Creole"],
-    features: ["Historic", "Garden", "Indoor", "Outdoor", "Elegant", "Intimate"],
-    amenities: [
-      "Historic mansion ceremony location",
-      "Beautiful garden reception options",
-      "Elegant indoor dining hall",
-      "Professional catering service",
-      "Audio-visual equipment",
-      "Wedding coordinator",
-      "Parking for 50+ cars",
-      "Free WiFi throughout venue"
-    ],
-    gallery: [
-      "/Venues.jpg",
-      "/Venues.jpg", 
-      "/Venues.jpg",
-      "/Venues.jpg",
-      "/Venues.jpg",
-      "/Venues.jpg"
-    ],
-    packages: [
-      {
-        name: "Garden Package",
-        price: "Rs 40,000",
-        duration: "6 hours",
-        includes: [
-          "Garden ceremony setup",
-          "Outdoor reception area",
-          "Basic decoration",
-          "Standard catering (3 courses)",
-          "Wedding coordinator",
-          "Basic audio system",
-          "Welcome drinks",
-          "Parking access"
-        ]
-      },
-      {
-        name: "Elegant Package",
-        price: "Rs 60,000",
-        duration: "8 hours",
-        includes: [
-          "Historic mansion ceremony",
-          "Elegant reception hall",
-          "Premium decoration",
-          "Gourmet catering (4 courses)",
-          "Dedicated wedding coordinator",
-          "Professional audio-visual system",
-          "Welcome cocktail + canapés",
-          "Wedding cake included",
-          "Photography locations access"
-        ]
-      }
-    ],
-    contact: {
-      phone: "+230 5 345 6789",
-      email: "events@chateaulabourdonnais.mu",
-      website: "www.chateaulabourdonnais.mu",
-      address: "Château de Labourdonnais, Mapou, Mauritius"
-    },
-    availability: [
-      "January 2025 - Available",
-      "February 2025 - Available", 
-      "March 2025 - 2 dates left",
-      "April 2025 - Available",
-      "May 2025 - Available"
-    ]
-  }
-};
+import { getVendorsByCategory } from '@/lib/data/vendors';
 
-export default function VenueProfilePage({ params }: { params: { slug: string } }) {
+const venues = Object.fromEntries(
+  getVendorsByCategory('Venues').map((v) => [v.slug, v])
+);
+
+export default function VenueProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
-  const venueData = venues[params.slug as keyof typeof venues];
+  const venueData = venues[slug as keyof typeof venues];
 
   if (!venueData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Venue Not Found</h1>
-          <p className="text-gray-600">The venue you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The venue you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -234,10 +62,6 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
             <div className="flex items-center gap-1">
               <MapPin className="text-gray-300" />
               <span>{venueData.location}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Users className="text-gray-300" />
-              <span>{venueData.capacity}</span>
             </div>
           </div>
           <Button 
@@ -295,16 +119,11 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                       <span className="font-medium">Experience:</span>
                       <span>{venueData.experience}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="text-pink-500" />
-                      <span className="font-medium">Capacity:</span>
-                      <span>{venueData.capacity}</span>
-                    </div>
                   </div>
 
                   <h3 className="text-xl font-semibold mb-3">Key Features</h3>
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {venueData.features.map((feature) => (
+                    {(venueData.features ?? []).map((feature) => (
                       <span
                         key={feature}
                         className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
@@ -315,7 +134,7 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                   </div>
 
                   <h3 className="text-xl font-semibold mb-3">Languages</h3>
-                  <p className="text-gray-700">{venueData.languages.join(', ')}</p>
+                  <p className="text-gray-700">{(venueData.languages ?? []).join(', ')}</p>
                 </CardContent>
               </Card>
 
@@ -325,7 +144,7 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
             <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
-                vendorId={venueData.id.toString()}
+                vendorId={venueData.id}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />
@@ -369,10 +188,6 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                       <span className="font-semibold">{venueData.reviews}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Capacity</span>
-                      <span className="font-semibold">{venueData.capacity}</span>
-                    </div>
-                    <div className="flex justify-between">
                       <span>Starting Price</span>
                       <span className="font-semibold">{venueData.price}</span>
                     </div>
@@ -387,7 +202,7 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
           <div>
             <h2 className="text-3xl font-bold mb-8">Venue Gallery</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {venueData.gallery.map((image, index) => (
+              {(venueData.gallery ?? venueData.portfolio).map((image, index) => (
                 <div key={index} className="group cursor-pointer">
                   <div className="relative h-64 rounded-lg overflow-hidden">
                     <Image
@@ -422,7 +237,7 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
                     <div className="text-3xl font-bold text-pink-600 mb-2">{pkg.price}</div>
-                    <div className="text-gray-600 mb-4">{pkg.capacity}</div>
+                    {pkg.duration && <div className="text-gray-600 mb-4">{pkg.duration}</div>}
                     <ul className="space-y-2 mb-6">
                       {pkg.includes.map((item, itemIndex) => (
                         <li key={itemIndex} className="flex items-center gap-2">
@@ -464,7 +279,7 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
           <div>
             <h2 className="text-3xl font-bold mb-8">Venue Amenities</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {venueData.amenities.map((amenity, index) => (
+              {(venueData.amenities ?? []).map((amenity, index) => (
                 <Card key={index}>
                   <CardContent className="p-6 text-center">
                     <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -505,8 +320,8 @@ export default function VenueProfilePage({ params }: { params: { slug: string } 
                       </div>
                     </div>
                     <p className="text-gray-700">
-                      "Absolutely stunning venue! The beachfront ceremony was magical and the staff was incredibly professional. 
-                      Our guests couldn't stop talking about how beautiful everything was. Worth every penny!"
+                      &ldquo;Absolutely stunning venue! The beachfront ceremony was magical and the staff was incredibly professional.
+                      Our guests couldn&apos;t stop talking about how beautiful everything was. Worth every penny!&rdquo;
                     </p>
                   </CardContent>
                 </Card>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { WeddingDatePicker } from '@/components/ui/date-picker';
@@ -8,168 +8,28 @@ import { AvailabilityCalendar } from '@/components/ui/availability-calendar';
 import Image from 'next/image';
 import { Calendar, MapPin, Star, Phone, Mail, Globe, Clock, Users, Award } from 'lucide-react';
 
-// Mock data for photographers - replace with database data later
-const photographers = {
-  'sarah-johnson-photography': {
-  id: 1,
-  slug: 'sarah-johnson-photography',
-  name: "Sarah Johnson Photography",
-  location: "Port Louis, Mauritius",
-  rating: 4.9,
-  reviews: 127,
-  price: "From Rs 25,000",
-  image: "/Photographer.jpg",
-  description: "Specializing in elegant wedding photography with a natural, candid style. Sarah captures the authentic moments that make your wedding day truly special.",
-  specialties: ["Wedding Photography", "Engagement Sessions", "Portrait Photography", "Destination Weddings"],
-  experience: "8+ years",
-  languages: ["English", "French", "Creole"],
-  equipment: "Canon EOS R5, Sony A7R IV, Professional Lighting",
-  portfolio: [
-    "/Photographer.jpg",
-    "/Photographer.jpg", 
-    "/Photographer.jpg",
-    "/Photographer.jpg",
-    "/Photographer.jpg",
-    "/Photographer.jpg"
-  ],
-  packages: [
-    {
-      name: "Basic Package",
-      price: "Rs 25,000",
-      duration: "6 hours",
-      includes: [
-        "Full day coverage",
-        "200+ edited photos",
-        "Online gallery",
-        "USB with photos",
-        "Basic editing"
-      ]
-    },
-    {
-      name: "Premium Package", 
-      price: "Rs 35,000",
-      duration: "8 hours",
-      includes: [
-        "Full day coverage",
-        "300+ edited photos",
-        "Online gallery",
-        "USB with photos",
-        "Advanced editing",
-        "Engagement session",
-        "Wedding album (20 pages)"
-      ]
-    },
-    {
-      name: "Luxury Package",
-      price: "Rs 50,000", 
-      duration: "10 hours",
-      includes: [
-        "Full day coverage",
-        "400+ edited photos",
-        "Online gallery",
-        "USB with photos",
-        "Premium editing",
-        "Engagement session",
-        "Wedding album (30 pages)",
-        "Second photographer",
-        "Drone coverage"
-      ]
-    }
-  ],
-  contact: {
-    phone: "+230 5 123 4567",
-    email: "sarah@sarahjohnsonphoto.mu",
-    website: "www.sarahjohnsonphoto.mu",
-    address: "123 Victoria Street, Port Louis, Mauritius"
-  },
-  availability: [
-    "January 2025 - Available",
-    "February 2025 - Available", 
-    "March 2025 - 2 dates left",
-    "April 2025 - Available",
-    "May 2025 - Available"
-  ]
-  },
-  'mauritius-moments': {
-    id: 2,
-    slug: 'mauritius-moments',
-    name: "Mauritius Moments",
-    location: "Grand Baie, Mauritius",
-    rating: 4.8,
-    reviews: 89,
-    price: "From Rs 20,000",
-    image: "/Photographer.jpg",
-    description: "Capturing beautiful moments with a creative and artistic approach. Specializing in destination weddings and cultural celebrations.",
-    specialties: ["Wedding Photography", "Destination Weddings", "Cultural Events", "Portrait Photography"],
-    experience: "6+ years",
-    languages: ["English", "French", "Creole"],
-    equipment: "Nikon D850, Canon EOS R6, Professional Lighting",
-    portfolio: [
-      "/Photographer.jpg",
-      "/Photographer.jpg", 
-      "/Photographer.jpg",
-      "/Photographer.jpg",
-      "/Photographer.jpg",
-      "/Photographer.jpg"
-    ],
-    packages: [
-      {
-        name: "Essential Package",
-        price: "Rs 20,000",
-        duration: "6 hours",
-        includes: [
-          "Full day coverage",
-          "150+ edited photos",
-          "Online gallery",
-          "USB with photos",
-          "Basic editing"
-        ]
-      },
-      {
-        name: "Deluxe Package", 
-        price: "Rs 30,000",
-        duration: "8 hours",
-        includes: [
-          "Full day coverage",
-          "250+ edited photos",
-          "Online gallery",
-          "USB with photos",
-          "Premium editing",
-          "Engagement session"
-        ]
-      }
-    ],
-    contact: {
-      phone: "+230 5 234 5678",
-      email: "info@mauritiusmoments.mu",
-      website: "www.mauritiusmoments.mu",
-      address: "456 Coastal Road, Grand Baie, Mauritius"
-    },
-    availability: [
-      "January 2025 - Available",
-      "February 2025 - 1 date left", 
-      "March 2025 - Available",
-      "April 2025 - Available",
-      "May 2025 - 3 dates left"
-    ]
-  }
-};
+import { getVendorsByCategory } from '@/lib/data/vendors';
 
-export default function PhotographerProfilePage({ params }: { params: { slug: string } }) {
+const photographers = Object.fromEntries(
+  getVendorsByCategory('Photographers').map((v) => [v.slug, v])
+);
+
+export default function PhotographerProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
-  const photographerData = photographers[params.slug as keyof typeof photographers];
+  const photographerData = photographers[slug as keyof typeof photographers];
 
   if (!photographerData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Photographer Not Found</h1>
-          <p className="text-gray-600">The photographer you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The photographer you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -287,7 +147,7 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
             <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
-                vendorId={photographerData.id.toString()}
+                vendorId={photographerData.id}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />
@@ -360,9 +220,9 @@ export default function PhotographerProfilePage({ params }: { params: { slug: st
                       </div>
                     </div>
                     <p className="text-gray-700">
-                      "Sarah was absolutely amazing! She captured every special moment of our wedding day. 
-                      Her attention to detail and creative eye made our photos absolutely stunning. 
-                      Highly recommend!"
+                      &ldquo;Sarah was absolutely amazing! She captured every special moment of our wedding day.
+                      Her attention to detail and creative eye made our photos absolutely stunning.
+                      Highly recommend!&rdquo;
                     </p>
                   </CardContent>
                 </Card>

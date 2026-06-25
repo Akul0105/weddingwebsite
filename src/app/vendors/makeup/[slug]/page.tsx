@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,59 +11,26 @@ import { Star, MapPin, Phone, Mail, Calendar, Users, Award, Clock } from 'lucide
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
-// Mock data - replace with API data
-const makeupVendors = {
-  'bridal-beauty-studio': {
-    id: 8,
-    name: 'Bridal Beauty Studio',
-    category: 'Makeup Artists',
-    location: 'Flic en Flac, Mauritius',
-    rating: 4.9,
-    reviews: 89,
-    price: 'From Rs 12,000',
-    image: '/makeup.jpg',
-    description: 'Professional makeup artistry specializing in bridal beauty to make you look and feel absolutely stunning on your special day.',
-    specialties: ['Bridal Makeup', 'Hair Styling', 'Bridal Packages'],
-    experience: '7 years',
-    languages: ['English', 'French', 'Creole'],
-    portfolio: [
-      '/makeup.jpg',
-      '/makeup.jpg',
-      '/makeup.jpg'
-    ],
-    packages: [
-      {
-        name: 'Bridal Package',
-        price: 'Rs 12,000',
-        includes: ['Bridal makeup', 'Hair styling', 'Trial session']
-      },
-      {
-        name: 'Complete Package',
-        price: 'Rs 18,000',
-        includes: ['Bridal makeup', 'Hair styling', 'Bridesmaids makeup', 'Trial session', 'Touch-ups']
-      }
-    ],
-    availability: {
-      availableDates: [],
-      unavailableDates: [],
-      partiallyAvailableDates: []
-    }
-  }
-};
+import { getVendorsByCategory } from '@/lib/data/vendors';
 
-export default function MakeupVendorPage({ params }: { params: { slug: string } }) {
+const makeupVendors = Object.fromEntries(
+  getVendorsByCategory('Makeup Artists').map((v) => [v.slug, v])
+);
+
+export default function MakeupVendorPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
-  const makeupData = makeupVendors[params.slug as keyof typeof makeupVendors];
+  const makeupData = makeupVendors[slug as keyof typeof makeupVendors];
 
   if (!makeupData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Makeup Artist Not Found</h1>
-          <p className="text-gray-600">The makeup artist you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The makeup artist you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -187,7 +154,7 @@ export default function MakeupVendorPage({ params }: { params: { slug: string } 
             <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
-                vendorId={makeupData.id.toString()}
+                vendorId={makeupData.id}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />

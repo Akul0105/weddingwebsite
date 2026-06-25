@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,11 +13,12 @@ import { toast } from 'react-hot-toast';
 import { VendorService } from '@/services/vendorService';
 import { Vendor } from '@/types/vendor';
 
-export default function VendorDetailPage({ 
-  params 
-}: { 
-  params: { category: string; slug: string } 
+export default function VendorDetailPage({
+  params
+}: {
+  params: Promise<{ category: string; slug: string }>
 }) {
+  const { slug } = use(params);
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -28,7 +29,7 @@ export default function VendorDetailPage({
     const fetchVendor = async () => {
       try {
         setLoading(true);
-        const vendorData = await VendorService.getVendorBySlug(params.slug);
+        const vendorData = await VendorService.getVendorBySlug(slug);
         setVendor(vendorData);
       } catch (error) {
         console.error('Error fetching vendor:', error);
@@ -39,7 +40,7 @@ export default function VendorDetailPage({
     };
 
     fetchVendor();
-  }, [params.slug]);
+  }, [slug]);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +63,7 @@ export default function VendorDetailPage({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Vendor Not Found</h1>
-          <p className="text-gray-600">The vendor you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The vendor you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );

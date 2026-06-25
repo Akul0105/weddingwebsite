@@ -48,11 +48,6 @@ export default function ForVendorsPage() {
     } catch (err) {
       setStatus('error');
       setErrorMessage(err instanceof Error ? err.message : 'Failed to submit. Please try again.');
-    } finally {
-      setStatus((prev) => (prev === 'success' ? 'success' : status));
-      if (status !== 'success') {
-        setStatus((prev) => (prev === 'success' ? prev : 'idle'));
-      }
     }
   };
 
@@ -82,7 +77,7 @@ export default function ForVendorsPage() {
               Join Our Platform
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mb-8 text-gray-200">
-              Connect with thousands of couples and grow your wedding business with Mauritius' leading wedding platform.
+              Connect with thousands of couples and grow your wedding business with Mauritius&apos; leading wedding platform.
             </p>
           </motion.div>
         </div>
@@ -103,7 +98,7 @@ export default function ForVendorsPage() {
                 Join Our Platform
               </h2>
               <p className="text-pink-100">
-                Fill out the form below and we'll get back to you within 24 hours.
+                Fill out the form below and we&apos;ll get back to you within 24 hours.
               </p>
             </div>
             

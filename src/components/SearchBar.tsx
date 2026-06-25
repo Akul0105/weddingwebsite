@@ -215,7 +215,7 @@ export function SearchBar({ className = "" }: SearchBarProps) {
                 animate={{ opacity: 1 }}
               >
                 <X className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p>No vendors found for "{searchTerm}"</p>
+                <p>No vendors found for &ldquo;{searchTerm}&rdquo;</p>
               </motion.div>
             )}
           </motion.div>

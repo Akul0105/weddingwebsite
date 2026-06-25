@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,59 +11,26 @@ import { Star, MapPin, Phone, Mail, Calendar, Users, Award, Clock } from 'lucide
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
-// Mock data - replace with API data
-const decoratorVendors = {
-  'elegant-events': {
-    id: 7,
-    name: 'Elegant Events',
-    category: 'Decorators',
-    location: 'Port Louis, Mauritius',
-    rating: 4.7,
-    reviews: 112,
-    price: 'From Rs 20,000',
-    image: '/decorations.jpg',
-    description: 'Transform your venue into a magical wonderland with our creative and elegant decoration services.',
-    specialties: ['Floral', 'Lighting', 'Themed'],
-    experience: '6 years',
-    languages: ['English', 'French', 'Creole'],
-    portfolio: [
-      '/decorations.jpg',
-      '/decorations.jpg',
-      '/decorations.jpg'
-    ],
-    packages: [
-      {
-        name: 'Basic Package',
-        price: 'Rs 20,000',
-        includes: ['Basic floral arrangements', 'Table decorations', 'Setup']
-      },
-      {
-        name: 'Premium Package',
-        price: 'Rs 35,000',
-        includes: ['Premium floral arrangements', 'Lighting design', 'Themed decorations', 'Full setup & breakdown']
-      }
-    ],
-    availability: {
-      availableDates: [],
-      unavailableDates: [],
-      partiallyAvailableDates: []
-    }
-  }
-};
+import { getVendorsByCategory } from '@/lib/data/vendors';
 
-export default function DecoratorVendorPage({ params }: { params: { slug: string } }) {
+const decoratorVendors = Object.fromEntries(
+  getVendorsByCategory('Decorators').map((v) => [v.slug, v])
+);
+
+export default function DecoratorVendorPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
-  const decoratorData = decoratorVendors[params.slug as keyof typeof decoratorVendors];
+  const decoratorData = decoratorVendors[slug as keyof typeof decoratorVendors];
 
   if (!decoratorData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Decorator Not Found</h1>
-          <p className="text-gray-600">The decorator you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The decorator you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -187,7 +154,7 @@ export default function DecoratorVendorPage({ params }: { params: { slug: string
             <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
-                vendorId={decoratorData.id.toString()}
+                vendorId={decoratorData.id}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />

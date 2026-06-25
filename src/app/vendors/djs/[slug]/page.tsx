@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,59 +11,26 @@ import { Star, MapPin, Phone, Mail, Calendar, Users, Award, Clock } from 'lucide
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
-// Mock data - replace with API data
-const djVendors = {
-  'island-beats-dj': {
-    id: 6,
-    name: 'Island Beats DJ',
-    category: 'DJs',
-    location: 'Grand Baie, Mauritius',
-    rating: 4.6,
-    reviews: 78,
-    price: 'From Rs 15,000',
-    image: '/DJ.jpg',
-    description: 'Professional DJ services with modern sound equipment and an extensive music library to keep your dance floor moving all night long.',
-    specialties: ['Wedding', 'Party', 'Sound System'],
-    experience: '5 years',
-    languages: ['English', 'French', 'Creole'],
-    portfolio: [
-      '/DJ.jpg',
-      '/DJ.jpg',
-      '/DJ.jpg'
-    ],
-    packages: [
-      {
-        name: 'Basic Package',
-        price: 'Rs 15,000',
-        includes: ['4-hour DJ service', 'Basic sound system', 'Music library']
-      },
-      {
-        name: 'Premium Package',
-        price: 'Rs 25,000',
-        includes: ['6-hour DJ service', 'Professional sound system', 'Lighting effects', 'MC services']
-      }
-    ],
-    availability: {
-      availableDates: [],
-      unavailableDates: [],
-      partiallyAvailableDates: []
-    }
-  }
-};
+import { getVendorsByCategory } from '@/lib/data/vendors';
 
-export default function DJVendorPage({ params }: { params: { slug: string } }) {
+const djVendors = Object.fromEntries(
+  getVendorsByCategory('DJs').map((v) => [v.slug, v])
+);
+
+export default function DJVendorPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
-  const djData = djVendors[params.slug as keyof typeof djVendors];
+  const djData = djVendors[slug as keyof typeof djVendors];
 
   if (!djData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">DJ Not Found</h1>
-          <p className="text-gray-600">The DJ you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The DJ you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -187,7 +154,7 @@ export default function DJVendorPage({ params }: { params: { slug: string } }) {
             <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
-                vendorId={djData.id.toString()}
+                vendorId={djData.id}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />

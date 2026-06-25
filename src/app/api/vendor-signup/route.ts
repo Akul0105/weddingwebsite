@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(
@@ -10,6 +8,7 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const to = (process.env.TO_EMAIL || '').split(',').map((email) => email.trim()).filter(Boolean);
   const from = process.env.FROM_EMAIL;
@@ -48,7 +47,7 @@ export async function POST(req: Request) {
       from,
       to,
       subject: 'New Vendor Application',
-      reply_to: email,
+      replyTo: email,
       text: `
 New vendor application:
 

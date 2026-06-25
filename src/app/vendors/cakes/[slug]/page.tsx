@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,59 +11,26 @@ import { Star, MapPin, Phone, Mail, Calendar, Users, Award, Clock } from 'lucide
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
-// Mock data - replace with API data
-const cakeVendors = {
-  'sweet-dreams-bakery': {
-    id: 1,
-    name: 'Sweet Dreams Bakery',
-    category: 'Cakes',
-    location: 'Curepipe, Mauritius',
-    rating: 4.8,
-    reviews: 156,
-    price: 'From Rs 8,000',
-    image: '/Cake.jpg',
-    description: 'Creating beautiful and delicious wedding cakes that make your special day even sweeter.',
-    specialties: ['Wedding Cakes', 'Custom Designs', 'Sugar Flowers'],
-    experience: '8 years',
-    languages: ['English', 'French', 'Creole'],
-    portfolio: [
-      '/Cake.jpg',
-      '/Cake.jpg',
-      '/Cake.jpg'
-    ],
-    packages: [
-      {
-        name: 'Classic Package',
-        price: 'Rs 8,000',
-        includes: ['2-tier cake', 'Basic decoration', 'Delivery']
-      },
-      {
-        name: 'Premium Package',
-        price: 'Rs 15,000',
-        includes: ['3-tier cake', 'Custom design', 'Sugar flowers', 'Delivery & setup']
-      }
-    ],
-    availability: {
-      availableDates: [],
-      unavailableDates: [],
-      partiallyAvailableDates: []
-    }
-  }
-};
+import { getVendorsByCategory } from '@/lib/data/vendors';
 
-export default function CakeVendorPage({ params }: { params: { slug: string } }) {
+const cakeVendors = Object.fromEntries(
+  getVendorsByCategory('Cakes').map((v) => [v.slug, v])
+);
+
+export default function CakeVendorPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const [activeTab, setActiveTab] = useState('overview');
   const [weddingDate, setWeddingDate] = useState<Date | undefined>();
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState<Date | undefined>();
 
-  const cakeData = cakeVendors[params.slug as keyof typeof cakeVendors];
+  const cakeData = cakeVendors[slug as keyof typeof cakeVendors];
 
   if (!cakeData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Cake Vendor Not Found</h1>
-          <p className="text-gray-600">The cake vendor you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The cake vendor you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -187,7 +154,7 @@ export default function CakeVendorPage({ params }: { params: { slug: string } })
             <div className="space-y-6">
               {/* Availability Calendar */}
               <AvailabilityCalendar
-                vendorId={cakeData.id.toString()}
+                vendorId={cakeData.id}
                 selectedDate={selectedAvailabilityDate}
                 onDateSelect={setSelectedAvailabilityDate}
               />

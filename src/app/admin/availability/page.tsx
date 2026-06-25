@@ -73,7 +73,7 @@ export default function AdminAvailabilityPage() {
 
   const selectedVendorData = vendors.find(v => v.id === selectedVendor);
 
-  const handleSaveAvailability = (availability: any) => {
+  const handleSaveAvailability = (availability: unknown) => {
     // Save to API
     console.log('Saving availability for vendor:', selectedVendor, availability);
     // Here you would make an API call to save the availability
